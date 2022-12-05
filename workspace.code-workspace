@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"name": "iframe-multi",
+			"path": "."
+		},
+		{
+			"name": "shared",
+			"path": "../money-boy-hub/shared"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "iframe-multi",
+		"liveServer.settings.port": 5501
+	}
+}

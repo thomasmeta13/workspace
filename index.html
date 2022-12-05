@@ -1,0 +1,423 @@
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Room</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="scripts/custom/CSS3DRenderer.js"></script>
+    <script src="scripts/custom/CSS3DStereoRenderer.js"></script>
+    <script src="scripts/custom/components.js"></script>
+
+    <link rel="stylesheet" href="styles/custom.css">
+
+</head>
+
+<body>
+    <script>
+        //entity-slider component
+        AFRAME.registerComponent('website-display', {
+            //schema of the component
+            schema: {
+                url: { type: "string", default: "https://www.google.com/webhp?igu=1" },
+                density: { type: "number", default: 1000 }
+
+            },
+            //using events ensures that event handlers properly clean themselves up when the entity or scene is paused, or the component is detached.
+            events: {
+            },
+            //initializes the entity-slider
+            init: function () {
+                this.found = false;
+            },
+            initCSS: function () {
+                this.cssRenderer.setSize(window.innerWidth, window.innerHeight);
+                this.cssRenderer.domElement.style.position = 'absolute';
+                this.cssRenderer.domElement.style.pointerEvents = "none";
+                document.querySelector('a-scene').appendChild(this.cssRenderer.domElement);
+                window.addEventListener('resize', this.onWindowResize.bind(this), false);
+            },
+            loadIframe: async function (url) {
+                var gridX = 5;
+                var gridY = 5;
+                var duration = 500;
+                var timeOut = 100;
+                let width = (this.data.density * this.el.object3D.scale.x);
+                let height = (this.data.density * this.el.object3D.scale.y);
+
+                var element = document.createElement('div');
+                this.htmlElement = element;
+                element.className = 'element';
+                element.style.width = width.toString() + 'px';
+                element.style.height = height.toString() + 'px';
+                element.style.backgroundColor = 'rgba(0,127,127,' + (Math.random() * 0.5 + 0.25) + ')';
+                var iframe = document.createElement('iframe');
+                iframe.style.backgroundColor = '#ffffff';
+                iframe.style.width = width.toString() + 'px';
+                iframe.style.height = height.toString() + 'px';
+                loadTime = (new Date()).getTime();
+                iframe.src = url;
+                iframe.frameBorder = "0";
+                iframe.featurePolicy = "{&quot;vr&quot;: [&quot;*&quot;]}";
+                iframe.allow = "camera;microphone;";
+                iframe.allowFullscreen = "true";
+                iframe.setAttribute("allowvr", "yes");
+                iframe.scrolling = "yes";
+                iframe.onload = function (e) {
+                    var diff = (new Date()).getTime() - loadTime;
+                    if (diff < timeOut) {
+                        iframe.src = "data:text/html;charset=utf-8," + escape('<h1>XSS</h1>');
+                    }
+                };
+                element.appendChild(iframe);
+                var object = new CSS3DObject(element);
+                // don't know why, but it works, probably updates matrix position or something
+                await (new THREE.Vector3()).setFromMatrixPosition(this.el.object3D.matrixWorld)
+                const realWorldPosition = this.el.object3D.getWorldPosition(new THREE.Vector3())
+                object.position.copy(realWorldPosition)
+                const realWorldQuaternion = this.el.object3D.getWorldQuaternion(new THREE.Quaternion());
+                await object.quaternion.copy(realWorldQuaternion)
+                object.scale.set(1 / (this.data.density), 1 / (this.data.density), 1 / (this.data.density))
+                var target = new THREE.Object3D();
+                target.position.x = 0;
+                target.position.y = 0;
+                this.cssScene.add(object);
+                this.el.sceneEl.object3D.updateMatrixWorld();
+
+            },
+            animate: function () {
+                var requestId = requestAnimationFrame(this.animate.bind(this));
+                this.render();
+            },
+            render: function () {
+                //this.el.sceneEl.renderer.render(this.el.sceneEl.object3D, this.camera);
+                this.cssRenderer.render(this.cssScene, this.camera);
+                //this.cssRenderer.render(this.el.sceneEl.object3D, this.camera);
+
+            },
+            onWindowResize: function () {
+                var positionInfo = this.el.sceneEl.getBoundingClientRect();
+
+                this.camera.aspect = positionInfo.width / positionInfo.height;
+                this.camera.updateProjectionMatrix();
+
+                this.cssRenderer.setSize(positionInfo.width, positionInfo.height);
+
+            },
+            //most of the logic is in the .update() handler so that it can initialize and handle updates all at once without repeating code
+            update: async function (oldData) {
+                if (!this.el.sceneEl) {
+                    this.el.sceneEl.addEventListener("loaded", this.update.bind(this))
+                } else if (!this.el.sceneEl.camera) {
+                    await this.el.sceneEl.camera;
+                    this.update();
+                } else {
+                    try {
+                        this.cssScene = new THREE.Scene()
+                        this.camera = this.el.sceneEl.camera;
+                        this.cssRenderer = new CSS3DRenderer();
+                        this.el.sceneEl.object3D.scale.set(1, 1, 1);
+
+                        this.found = true;
+                        this.initCSS();
+                        this.loadIframe(this.data.url);
+                        this.animate();
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+            },
+            //handle component removal
+            remove: function () {
+                this.cssScene.remove.apply(this.cssScene, this.cssScene.children);
+                this.htmlElement.remove();
+            },
+            tick: function (time, timeDelta) {
+            }
+        });
+
+    </script>
+    <div id="scene_wrapper" style="opacity: 1a;">
+        <a-scene>
+            <!-- assets management system -->
+            <a-assets timeout="100000">
+                <a-asset-item id="room-gltf" src="assets/models/hubb.glb"></a-asset-item>
+                <a-asset-item id="chair-gltf" src="assets/models/chair.glb"></a-asset-item>
+                <a-asset-item id="tablet-gltf" src="assets/models/tablet.glb"></a-asset-item>
+                <a-asset-item id="table-gltf" src="assets/models/table.glb"></a-asset-item>
+
+
+                <img id="hub-img" src="assets/images/hub.png">
+                <img id="sky-img" src="assets/images/sky.jpg">
+
+
+            </a-assets>
+
+            <!-- camera -->
+            <a-entity id="player">
+                <a-entity simple-navmesh-constraint="navmesh:#navmesh;fall:0.5;height:1.65;" id="head"
+                          camera="fov: 70; active: true" position="0 1.65 0" wasd-controls="acceleration: 20;"
+                          look-controls="pointerLockEnabled: true; reverseMouseDrag: false">
+                    <a-entity id="cursor" class="mouseOnly" cursor raycaster="far: 10; objects: .clickable"
+                              material="color: white; shader: flat" position="0 0 -0.3"
+                              geometry="primitive: sphere; radius: 0.001">
+                    </a-entity>
+                </a-entity>
+                <!-- Left Controller   -->
+                <a-entity id="leftHand" class="leftController controllerOnly"
+                          hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"
+                          laser-controls="hand: left" vive-controls="hand: left" oculus-touch-controls="hand: left"
+                          windows-motion-controls="hand: left" daydream-controls="hand: left"
+                          gearvr-controls="hand: left" magicleap-controls="hand: left" oculus-go-controls="hand: left"
+                          valve-index-controls="hand: left" vive-focus-controls="hand: left"
+                          generic-tracked-controller-controls="hand: left" raycaster="far: 0; objects: .leftclickable;"
+                          blink-controls="cameraRig: #player; teleportOrigin: #camera; button: trigger; curveShootingSpeed: 10; collisionEntities: .collision; landingMaxAngle: 10"
+                          visible="true"></a-entity>
+                <!-- Right Controller  -->
+                <a-entity id="rightHand" class="rightController controllerOnly"
+                          hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF"
+                          laser-controls="hand: right" vive-controls="hand: right" oculus-touch-controls="hand: right"
+                          windows-motion-controls="hand: right" daydream-controls="hand: right"
+                          gearvr-controls="hand: right" magicleap-controls="hand: right"
+                          oculus-go-controls="hand: right" valve-index-controls="hand: right"
+                          vive-focus-controls="hand: right" generic-tracked-controller-controls="hand: right"
+                          raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;"
+                          line="color: lawngreen; opacity: 0.5" visible="true"></a-entity>
+            </a-entity>
+
+            <!-- iframe panels-->
+            <a-entity rotation="0 0 0" scale="3 3.5 1" website-display="density: 300; url: https://www.tally.xyz/gov/eip155:1:0xDbD27635A534A3d3169Ef0498beB56Fb9c937489" 
+            position="1.3 2.44 -7.5" >
+                <a-entity id=""
+                          text="color: green; align: center; value: Video; width: 1.2">
+                </a-entity>
+            </a-entity>
+
+            <a-entity rotation="0 0 0" scale="3 3.5 1" website-display="density: 300; url: https://snapshot.org/#/gitcoindao.eth" 
+            position="4.73 2.44 -7.5">
+                <a-entity id=""
+                          text="color: green; align: center; value: Video; width: 1.2">
+                </a-entity>
+            </a-entity>
+            
+            <a-entity rotation="0 180 0" scale="6.4 3.5 1" website-display="density: 300; url: https://app.dework.xyz/nation3/community-and-govern/view/board-5392" 
+            position="3 2.44 7.5">
+                <a-entity id=""
+                          text="color: green; align: center; value: Video; width: 1.2">
+                </a-entity>
+            </a-entity>
+            
+
+            <!-- models-->
+
+            <a-gltf-model shadow="cast: true; receive: true" class="model" src="#room-gltf" position="0 0 0"
+                          scale="1 1 1">
+            </a-gltf-model>
+
+            <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="-3.2 0 4.5"
+                      scale="1 1 1">
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat1"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf" position="1.4 0 0"
+                              rotation="0 0 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat2"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.772 0 1.218" rotation="0 -50 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat3"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.749 0 1.218" rotation="0 -120 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat4"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-1.383 0 -0.118" rotation="0 180 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat5"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.749 0 -1.218" rotation="0 60 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat6"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.772 0 -1.218" rotation="0 130 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+
+            </a-entity>
+            <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="-3.2 0 -4.5"
+                      scale="1 1 1">
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat1"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf" position="1.4 0 0"
+                              rotation="0 0 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat2"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.772 0 1.218" rotation="0 -50 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat3"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.749 0 1.218" rotation="0 -120 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat4"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-1.383 0 -0.118" rotation="0 180 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat5"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.749 0 -1.218" rotation="0 60 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat6"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.772 0 -1.218" rotation="0 130 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+
+            </a-entity>
+
+            <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="9.2 0 -4.5"
+            scale="1 1 1">
+      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat1"
+                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf" position="1.4 0 0"
+                    rotation="0 0 0" scale="1 1 1">
+          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+      </a-gltf-model>
+      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat2"
+                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                    position="0.772 0 1.218" rotation="0 -50 0" scale="1 1 1">
+          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+      </a-gltf-model>
+      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat3"
+                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                    position="-0.749 0 1.218" rotation="0 -120 0" scale="1 1 1">
+          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+      </a-gltf-model>
+      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat4"
+                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                    position="-1.383 0 -0.118" rotation="0 180 0" scale="1 1 1">
+          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+      </a-gltf-model>
+      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat5"
+                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                    position="0.749 0 -1.218" rotation="0 60 0" scale="1 1 1">
+          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+      </a-gltf-model>
+      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat6"
+                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                    position="-0.772 0 -1.218" rotation="0 130 0" scale="1 1 1">
+          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+      </a-gltf-model>
+
+  </a-entity>
+
+            <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="9.2 0 4.5"
+                      scale="1 1 1">
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat1"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf" position="1.4 0 0"
+                              rotation="0 0 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat2"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.772 0 1.218" rotation="0 -50 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat3"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.749 0 1.218" rotation="0 -120 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat4"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-1.383 0 -0.118" rotation="0 180 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat5"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.749 0 -1.218" rotation="0 60 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat6"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.772 0 -1.218" rotation="0 130 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+
+            </a-entity>
+            
+
+           <!-- ambient light  -->
+           <a-entity light="type: ambient; intensity: 0; color:  #FFFFFF; shadowCameraVisible: false;"></a-entity>
+           <!-- table lights  -->
+           <a-entity light="type:point; color:  #FFFFFF; intensity: 1; distance: 10; decay: 1;" position="3 3 0">
+           </a-entity>
+           <a-entity light="type:point; color:  #FFFFFF; intensity: 1; distance: 10; castShadow: false; decay: 1"
+                     position="-2.5 3 4.6">
+           </a-entity>
+           <a-entity light="type:point; color:  #FFFFFF; intensity: 1; distance: 10; castShadow: false; decay: 1"
+                     position="-2.5 3 -4.6">
+           </a-entity>
+           <a-entity light="type:point; color:  #FFFFFF; intensity: 1; distance: 10; castShadow: false; decay: 1"
+                     position="8.7 3 4.6">
+           </a-entity>
+           <a-entity light="type:point; color:  #FFFFFF; intensity: 1; distance: 10; castShadow: false; decay: 1"
+                     position="8.7 3 -4.6">
+           </a-entity>
+           <!-- statue lights -->
+           <a-entity light="type:spot; angle: 60; color:  #DDAAFF; intensity: 10; distance: 6; decay: 1;"
+                     rotation="-45 90 0" position="-5 5.5 0">
+           </a-entity>
+           <!-- "ambient" lights -->
+           <a-entity light="type:spot; angle: 90; color:  #DDAAFF; intensity: 10; distance: 50; decay: 1; "
+                     rotation="-90 0 0" position="14 5.5 0">
+           </a-entity>
+           <a-entity light="type:spot; angle: 90; color:  #DDAAFF; intensity: 10; distance: 50; decay: 1; "
+                     rotation="-90 0 0" position="-13 5.5 0">
+           </a-entity>
+            </a-entity>
+
+            <a-sky src="#sky-img"></a-sky>
+
+        </a-scene>
+    </div>
+</body>
+
+<script>
+    let GSActive = false;
+    for (i = 0; i < 6; i++) {
+        let seat = document.querySelector("#seat" + (i + 1));
+        seat.addEventListener("click", () => {
+            if (GSActive == false) {
+                setTimeout(() => {
+                    seat.querySelector('.display').setAttribute("website-display", "density: 10000; url: https://snapshot.org/#/ens.eth");
+                    document.querySelectorAll("[seat]").forEach((e) => { if (e != seat) e.classList.remove("clickable") });
+                }, 3000)
+                GSActive = true;
+            }
+            else {
+                seat.querySelector('.display').removeAttribute("website-display");
+                document.querySelectorAll("[seat]").forEach((e) => { if (e != seat) e.classList.add("clickable") });
+                GSActive = false;
+            }
+        })
+
+    }
+
+</script>
+
+
+</html>
