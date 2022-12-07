@@ -144,10 +144,15 @@
 
     </script>
     <div id="scene_wrapper" style="opacity: 1a;">
-        <a-scene>
+        <a-scene renderer="antialias: true;
+                   colorManagement: true;
+                   sortObjects: true;
+                   physicallyCorrectLights: true;
+                   maxCanvasWidth: 1920;
+                   maxCanvasHeight: 1920;">
             <!-- assets management system -->
             <a-assets timeout="100000">
-                <a-asset-item id="room-gltf" src="assets/models/hub.glb"></a-asset-item>
+                <a-asset-item id="room-gltf" src="assets/models/hubbbbb.glb"></a-asset-item>
                 <a-asset-item id="chair-gltf" src="assets/models/chair.glb"></a-asset-item>
                 <a-asset-item id="tablet-gltf" src="assets/models/tablet.glb"></a-asset-item>
                 <a-asset-item id="table-gltf" src="assets/models/table.glb"></a-asset-item>
@@ -194,31 +199,29 @@
             </a-entity>
 
             <!-- iframe panels-->
-            <a-entity rotation="0 0 0" scale="3 3.5 1" website-display="density: 300; url: https://www.tally.xyz/gov/eip155:1:0xDbD27635A534A3d3169Ef0498beB56Fb9c937489" 
-            position="1.3 2.44 -7.5" >
-                <a-entity id=""
-                          text="color: green; align: center; value: Video; width: 1.2">
+            <a-entity rotation="0 0 0" scale="3 3.5 1"
+                      website-display="density: 300; url: https://www.jokedao.io"
+                      position="1.3 2.44 -7.5">
+                <a-entity id="" text="color: green; align: center; value: Video; width: 1.2">
                 </a-entity>
             </a-entity>
 
-            <a-entity rotation="0 0 0" scale="3 3.5 1" website-display="density: 300; url: https://snapshot.org/#/gitcoindao.eth" 
-            position="4.73 2.44 -7.5">
-                <a-entity id=""
-                          text="color: green; align: center; value: Video; width: 1.2">
+            <a-entity rotation="0 0 0" scale="3 3.5 1"
+                      website-display="density: 300; url: https://www.tally.xyz/gov/eip155:1:0xDbD27635A534A3d3169Ef0498beB56Fb9c937489"
+                      position="4.73 2.44 -7.5">
+                <a-entity id="" text="color: green; align: center; value: Video; width: 1.2">
                 </a-entity>
             </a-entity>
-                     <a-entity rotation="0 270 0" scale="1.3 2.1 1" website-display="density: 400; url: https://app.uniswap.org" 
-            position="13.1 1.34 -2.4">
-                <a-entity id=""
-                          text="color: green; align: center; value: Video; width: 1.2">
+            <a-entity rotation="0 270 0" scale="1.3 2.1 1" website-display="density: 400; url: https://app.uniswap.org"
+                      position="13.1 1.34 -2.4">
+                <a-entity id="" text="color: green; align: center; value: Video; width: 1.2">
                 </a-entity>
             </a-entity>
             
-            
-            <a-entity rotation="0 180 0" scale="6.4 3.5 1" website-display="density: 300; url: https://app.dework.xyz/nation3/community-and-govern/view/board-5392" 
+            <a-entity rotation="0 180 0" scale="6.4 3.5 1"
+            website-display="density: 300; url: https://www.twitch.tv/videos/1668577004?t=0h9m50s"
             position="3 2.44 7.5">
-                <a-entity id=""
-                          text="color: green; align: center; value: Video; width: 1.2">
+                <a-entity id="" text="color: green; align: center; value: Video; width: 1.2">
                 </a-entity>
             </a-entity>
 
@@ -229,10 +232,10 @@
             </a-gltf-model>
 
             <a-gltf-model shadow="cast: true; receive: true" class="model" src="#ATM-gltf" position="13.536 1.2 -2.407"
-            scale="1.3 1.3 1.3" rotation="0 270 0"></a-gltf-model>
+                          scale="1.3 1.3 1.3" rotation="0 270 0"></a-gltf-model>
 
-            <a-gltf-model shadow="cast: true; receive: true" class="model" src="#arcade-gltf" position="11.336 -0.1 .907"
-            scale="1.1 1.1 1.1" rotation="0 0 0"></a-gltf-model>
+            <a-gltf-model shadow="cast: true; receive: true" class="model" src="#arcade-gltf"
+                          position="11.336 -0.1 .907" scale="1.1 1.1 1.1" rotation="0 0 0"></a-gltf-model>
 
             <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="-3.2 0 4.5"
                       scale="1 1 1">
@@ -304,39 +307,39 @@
             </a-entity>
 
             <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="9.2 0 -4.5"
-            scale="1 1 1">
-      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat1"
-                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf" position="1.4 0 0"
-                    rotation="0 0 0" scale="1 1 1">
-          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
-      </a-gltf-model>
-      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat2"
-                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
-                    position="0.772 0 1.218" rotation="0 -50 0" scale="1 1 1">
-          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
-      </a-gltf-model>
-      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat3"
-                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
-                    position="-0.749 0 1.218" rotation="0 -120 0" scale="1 1 1">
-          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
-      </a-gltf-model>
-      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat4"
-                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
-                    position="-1.383 0 -0.118" rotation="0 180 0" scale="1 1 1">
-          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
-      </a-gltf-model>
-      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat5"
-                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
-                    position="0.749 0 -1.218" rotation="0 60 0" scale="1 1 1">
-          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
-      </a-gltf-model>
-      <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat6"
-                    shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
-                    position="-0.772 0 -1.218" rotation="0 130 0" scale="1 1 1">
-          <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
-      </a-gltf-model>
+                      scale="1 1 1">
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat1"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf" position="1.4 0 0"
+                              rotation="0 0 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat2"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.772 0 1.218" rotation="0 -50 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat3"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.749 0 1.218" rotation="0 -120 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat4"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-1.383 0 -0.118" rotation="0 180 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat5"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="0.749 0 -1.218" rotation="0 60 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
+                <a-gltf-model seat="duration: 1; camera: #head; standUpPosition: 1 1.6 1;" id="seat6"
+                              shadow="cast: true; receive: true" class="clickable" src="#chair-gltf"
+                              position="-0.772 0 -1.218" rotation="0 130 0" scale="1 1 1">
+                    <a-entity class="display" rotation="-15 90 0" scale="0.4 0.225 1" position="-0.2 1 0">
+                </a-gltf-model>
 
-  </a-entity>
+            </a-entity>
 
             <a-entity shadow="cast: true; receive: true" class="model" gltf-model="#table-gltf" position="9.2 0 4.5"
                       scale="1 1 1">
@@ -372,37 +375,37 @@
                 </a-gltf-model>
 
             </a-entity>
-            
 
-           <!-- ambient light  -->
-                       <!-- ambient light  -->
-                       <a-entity light="type: ambient; intensity: 0; color:  #FFFFFF; shadowCameraVisible: false;"></a-entity>
-                       <!-- table lights  -->
-                       <a-entity light="type:point; color:  #FFFFFF; intensity: 3; distance: 10; decay: 1;" position="3 3 0">
-                       </a-entity>
-                       <a-entity light="type:point; color:  #FFFFFF; intensity: 3; distance: 10; castShadow: false; decay: 1"
-                                 position="-2.5 3 4.6">
-                       </a-entity>
-                       <a-entity light="type:point; color:  #FFFFFF; intensity: 3; distance: 10; castShadow: false; decay: 1"
-                                 position="-2.5 3 -4.6">
-                       </a-entity>
-                       <a-entity light="type:point; color:  #FFFFFF; intensity: 3; distance: 10; castShadow: false; decay: 1"
-                                 position="8.7 3 4.6">
-                       </a-entity>
-                       <a-entity light="type:point; color:  #FFFFFF; intensity: 3; distance: 10; castShadow: false; decay: 1"
-                                 position="8.7 3 -4.6">
-                       </a-entity>
-                       <!-- statue lights -->
-                       <a-entity light="type:spot; angle: 60; color:  #DDAAFF; intensity: 3; distance: 6; decay: 1;"
-                                 rotation="-45 90 0" position="-5 5.5 0">
-                       </a-entity>
-                       <!-- "ambient" lights -->
-                       <a-entity light="type:spot; angle: 90; color:  #DDAAFF; intensity: 3; distance: 50; decay: 1; "
-                                 rotation="-90 0 0" position="14 5.5 0">
-                       </a-entity>
-                       <a-entity light="type:spot; angle: 90; color:  #DDAAFF; intensity: 3; distance: 50; decay: 1; "
-                                 rotation="-90 0 0" position="-13 5.5 0">
-                       </a-entity>
+
+            <!-- ambient light  -->
+            <!-- ambient light  -->
+            <a-entity light="type: ambient; intensity: 1; color:  #FFFFFF; shadowCameraVisible: false;"></a-entity>
+            <!-- table lights  -->
+            <a-entity light="type:point; color:  #FFFFFF; intensity: 1; distance: 10; decay: 1;" position="3 3 0">
+            </a-entity>
+            <a-entity light="type:point; color:  #FFFFFF;  intensity: 1; distance: 10; castShadow: false; decay: 1"
+                      position="-2.5 3 4.6">
+            </a-entity>
+            <a-entity light="type:point; color:  #FFFFFF;  intensity: 1; distance: 10; castShadow: false; decay: 1"
+                      position="-2.5 3 -4.6">
+            </a-entity>
+            <a-entity light="type:point; color:  #FFFFFF;  intensity: 1; distance: 10; castShadow: false; decay: 1"
+                      position="8.7 3 4.6">
+            </a-entity>
+            <a-entity light="type:point; color:  #FFFFFF;  intensity: 1; distance: 10; castShadow: false; decay: 1"
+                      position="8.7 3 -4.6">
+            </a-entity>
+            <!-- statue lights -->
+            <a-entity light="type:spot; angle: 60; color:  #FFFFFF;  intensity: 1; distance: 6; decay: 1;"
+                      rotation="-45 90 0" position="-5 5.5 0">
+            </a-entity>
+            <!-- "ambient" lights -->
+            <a-entity light="type:spot; angle: 90; color:  #FFFFFF;  intensity: 1; distance: 50; decay: 1; "
+                      rotation="-90 0 0" position="14 5.5 0">
+            </a-entity>
+            <a-entity light="type:spot; angle: 90; color:  #FFFFFF;  intensity: 1; distance: 50; decay: 1; "
+                      rotation="-90 0 0" position="-13 5.5 0">
+            </a-entity>
             </a-entity>
 
             <a-sky src="#sky-img"></a-sky>
@@ -418,7 +421,7 @@
         seat.addEventListener("click", () => {
             if (GSActive == false) {
                 setTimeout(() => {
-                    seat.querySelector('.display').setAttribute("website-display", "density: 10000; url: https://snapshot.org/#/ens.eth");
+                    seat.querySelector('.display').setAttribute("website-display", "density: 2000; url: https://app.huddle01.com/qE5S5Y");
                     document.querySelectorAll("[seat]").forEach((e) => { if (e != seat) e.classList.remove("clickable") });
                 }, 3000)
                 GSActive = true;
